@@ -37,9 +37,9 @@ export default function RegistrationScreen() {
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <KeyboardAvoidingView
+          style={styles.container}
           behavior={Platform.OS == "ios" ? "padding" : "height"}
           keyboardVerticalOffset={-170}
-          style={styles.container}
         >
           <View style={styles.formContainer}>
             <Avatar />
