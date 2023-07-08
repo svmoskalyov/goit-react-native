@@ -1,45 +1,51 @@
+import { View } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View, ImageBackground } from "react-native";
-import {
-  useFonts,
-  Roboto_400Regular,
-  Roboto_500Medium,
-} from "@expo-google-fonts/roboto";
+import { useFonts } from "expo-font";
+import * as SplashScreen from "expo-splash-screen";
+// import {
+//   useFonts,
+//   Roboto_400Regular,
+//   Roboto_500Medium,
+// } from "@expo-google-fonts/roboto";
 import LoginScreen from "./Screens/LoginScreen";
 import RegistrationScreen from "./Screens/RegistrationScreen";
-import BackgroundImage from "./assets/images/background.png";
+import { useCallback } from "react";
+
+SplashScreen.preventAutoHideAsync();
 
 export default function App() {
+  // const [fontsLoaded] = useFonts({
+  //   RobotoRegular: Roboto_400Regular,
+  //   RobotoMedium: Roboto_500Medium,
+  // });
+
   const [fontsLoaded] = useFonts({
-    RobotoRegular: Roboto_400Regular,
-    RobotoMedium: Roboto_500Medium,
+    "Roboto-Regular": require("./assets/fonts/Roboto-Regular.ttf"),
+    "Roboto-Medium": require("./assets/fonts/Roboto-Medium.ttf"),
   });
+
+  const onLayoutRootView = useCallback(async () => {
+    if (fontsLoaded) {
+      await SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
 
   if (!fontsLoaded) {
     return null;
   }
 
   return (
-    <View style={styles.container}>
+    <View onLayout={onLayoutRootView} style={{ flex: 1 }}>
       <StatusBar style="auto" />
-      <ImageBackground
-        source={BackgroundImage}
-        resizeMode="cover"
-        style={styles.image}
-      >
-        <RegistrationScreen />
-        {/* <LoginScreen /> */}
-      </ImageBackground>
+      <RegistrationScreen />
+      {/* <LoginScreen /> */}
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  image: {
-    flex: 1,
-    justifyContent: "flex-end",
-  },
-});
+// const styles = StyleSheet.create({
+//   container: {
+//     // flex: 1,
+//     // justifyContent: "flex-end",
+//   },
+// });
