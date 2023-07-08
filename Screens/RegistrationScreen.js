@@ -1,80 +1,100 @@
-import { View, Text, TextInput, StyleSheet } from "react-native";
+import React, { useState } from "react";
+import {
+  StyleSheet,
+  View,
+  TextInput,
+  TouchableWithoutFeedback,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  ImageBackground,
+  Text,
+  TouchableOpacity,
+} from "react-native";
+import backgroundImage from "../assets/images/background.png";
 import Avatar from "../components/Avatar";
 
-function RegistrationScreen() {
+export default function RegistrationScreen() {
   return (
-    <View style={styles.container}>
-      <Avatar />
-      <Text style={styles.title}>Реєстрація</Text>
-      <View style={styles.thumbInput}>
-        <TextInput
-          style={styles.input}
-          placeholder="Логін"
-          placeholderTextColor="#BDBDBD"
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Адреса електронної пошти"
-          placeholderTextColor="#BDBDBD"
-          keyboardType="email-address"
-        />
-        <View style={styles.passwordContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Пароль"
-            placeholderTextColor="#BDBDBD"
-            secureTextEntry
-          />
-          <View style={styles.passwordButton}>
-            <Text style={styles.passwordButtonText}>
-              {true ? "Показати" : "Приховати"}
-            </Text>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <ImageBackground
+        source={backgroundImage}
+        style={{ position: "absolute", width: "100%", height: "100%" }}
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS == "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={-165}
+          style={styles.container}
+        >
+          <View style={styles.formContainer}>
+            <Avatar />
+            <Text style={styles.formTitle}>Реєстрація</Text>
+            <View style={styles.inputThumb}>
+              <TextInput style={styles.formInput} placeholder="Логін" />
+              <TextInput
+                style={styles.formInput}
+                placeholder="Адреса електронної пошти"
+              />
+              <View style={styles.passwordContainer}>
+                <TextInput style={styles.formInput} placeholder="Пароль" />
+                <TouchableOpacity style={styles.passwordButton}>
+                  <Text style={styles.passwordButtonText}>
+                    {true ? "Показати" : "Приховати"}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+            <TouchableOpacity style={styles.button}>
+              <Text style={styles.buttonTitle}>Зареєстуватися</Text>
+            </TouchableOpacity>
+            <TouchableOpacity>
+              <Text style={styles.textLogin}>Вже є акаунт? Увійти</Text>
+            </TouchableOpacity>
           </View>
-        </View>
-      </View>
-      <View style={styles.button}>
-        <Text style={styles.buttonTitle}>Зареєстуватися</Text>
-      </View>
-      <View>
-        <Text style={styles.textAccount}>Вже є акаунт? Увійти</Text>
-      </View>
-    </View>
+        </KeyboardAvoidingView>
+      </ImageBackground>
+    </TouchableWithoutFeedback>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: "stretch",
+    flex: 1,
+    justifyContent: "flex-end",
+  },
+  formContainer: {
+    paddingTop: 92,
+    paddingBottom: 78,
     paddingHorizontal: 16,
-    height: 549,
     borderTopStartRadius: 25,
     borderTopEndRadius: 25,
-    backgroundColor: "#fff",
+    backgroundColor: "#FFFFFF",
   },
-
-  title: {
-    paddingTop: 32,
-    paddingBottom: 32,
-    textAlign: "center",
+  formTitle: {
+    marginBottom: 32,
     fontSize: 30,
-    fontFamily: "RobotoMedium",
+    fontFamily: "Roboto-Medium",
     letterSpacing: 0.3,
-    color: "#212121",
+    textAlign: "center",
   },
-  thumbInput: {
+  inputThumb: {
     marginBottom: 43,
     gap: 16,
   },
-  input: {
+  formInput: {
     padding: 16,
     height: 50,
-    fontSize: 16,
-    fontFamily: "RobotoRegular",
     borderRadius: 8,
+    fontSize: 16,
+    fontFamily: "Roboto-Regular",
+    backgroundColor: "#F6F6F6",
+  },
+  focusedFormInput: {
     borderWidth: 1,
     borderStyle: "solid",
-    borderColor: "#E8E8E8",
-    backgroundColor: "#F6F6F6",
+    borderRadius: 8,
+    borderColor: "#FF6C00",
+    backgroundColor: "#FFFFFF",
   },
   passwordContainer: {
     position: "relative",
@@ -86,7 +106,7 @@ const styles = StyleSheet.create({
   },
   passwordButtonText: {
     fontSize: 16,
-    fontFamily: "RobotoRegular",
+    fontFamily: "Roboto-Regular",
     color: "#1B4371",
   },
   button: {
@@ -99,15 +119,13 @@ const styles = StyleSheet.create({
   buttonTitle: {
     textAlign: "center",
     fontSize: 16,
-    fontFamily: "RobotoRegular",
+    fontFamily: "Roboto-Regular",
     color: "#FFFFFF",
   },
-  textAccount: {
+  textLogin: {
     textAlign: "center",
     fontSize: 16,
-    fontFamily: "RobotoRegular",
+    fontFamily: "Roboto-Regular",
     color: "#1B4371",
   },
 });
-
-export default RegistrationScreen;
