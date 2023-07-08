@@ -1,24 +1,14 @@
+import { useCallback } from "react";
 import { View } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
-// import {
-//   useFonts,
-//   Roboto_400Regular,
-//   Roboto_500Medium,
-// } from "@expo-google-fonts/roboto";
-import LoginScreen from "./Screens/LoginScreen";
 import RegistrationScreen from "./Screens/RegistrationScreen";
-import { useCallback } from "react";
+import LoginScreen from "./Screens/LoginScreen";
 
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
-  // const [fontsLoaded] = useFonts({
-  //   RobotoRegular: Roboto_400Regular,
-  //   RobotoMedium: Roboto_500Medium,
-  // });
-
   const [fontsLoaded] = useFonts({
     "Roboto-Regular": require("./assets/fonts/Roboto-Regular.ttf"),
     "Roboto-Medium": require("./assets/fonts/Roboto-Medium.ttf"),
@@ -42,10 +32,3 @@ export default function App() {
     </View>
   );
 }
-
-// const styles = StyleSheet.create({
-//   container: {
-//     // flex: 1,
-//     // justifyContent: "flex-end",
-//   },
-// });
