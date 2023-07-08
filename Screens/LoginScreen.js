@@ -10,10 +10,17 @@ import {
   ImageBackground,
   Text,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import backgroundImage from "../assets/images/background.png";
 
+const initialState = {
+  email: "",
+  password: "",
+};
+
 export default function LoginScreen() {
+  const [state, setState] = useState(initialState);
   const [focusedInput, setFocusedInput] = useState(null);
   const [isHidePassword, setIsHidePassword] = useState(true);
 
@@ -27,6 +34,17 @@ export default function LoginScreen() {
 
   const handleHidePassword = () => {
     setIsHidePassword(!isHidePassword);
+  };
+
+  const handleSubmit = () => {
+    const { email, password } = state;
+    if (email === "" || password === "") {
+      Alert.alert("Fill in all fields!");
+      return;
+    }
+
+    console.log(state);
+    setState(initialState);
   };
 
   return (
@@ -54,6 +72,10 @@ export default function LoginScreen() {
                 autoCapitalize="none"
                 onFocus={() => handleInputFocus("email")}
                 onBlur={handleInputBlur}
+                value={state.email}
+                onChangeText={(value) =>
+                  setState((prev) => ({ ...prev, email: value }))
+                }
               />
               <View style={styles.passwordContainer}>
                 <TextInput
@@ -66,6 +88,10 @@ export default function LoginScreen() {
                   secureTextEntry={isHidePassword}
                   onFocus={() => handleInputFocus("password")}
                   onBlur={handleInputBlur}
+                  value={state.password}
+                  onChangeText={(value) =>
+                    setState((prev) => ({ ...prev, password: value }))
+                  }
                 />
                 <TouchableOpacity
                   style={styles.passwordButton}
@@ -77,7 +103,7 @@ export default function LoginScreen() {
                 </TouchableOpacity>
               </View>
             </View>
-            <TouchableOpacity style={styles.button}>
+            <TouchableOpacity style={styles.button} onPress={handleSubmit}>
               <Text style={styles.buttonTitle}>Увійти</Text>
             </TouchableOpacity>
             <TouchableOpacity>

@@ -1,20 +1,28 @@
 import React, { useState } from "react";
 import {
-  StyleSheet,
-  View,
-  TextInput,
-  TouchableWithoutFeedback,
-  Keyboard,
-  KeyboardAvoidingView,
-  Platform,
   ImageBackground,
+  TouchableWithoutFeedback,
+  KeyboardAvoidingView,
+  View,
+  Platform,
+  Keyboard,
+  TextInput,
   Text,
   TouchableOpacity,
+  StyleSheet,
+  Alert,
 } from "react-native";
 import backgroundImage from "../assets/images/background.png";
 import Avatar from "../components/Avatar";
 
+const initialState = {
+  login: "",
+  email: "",
+  password: "",
+};
+
 export default function RegistrationScreen() {
+  const [state, setState] = useState(initialState);
   const [focusedInput, setFocusedInput] = useState(null);
   const [isHidePassword, setIsHidePassword] = useState(true);
 
@@ -28,6 +36,17 @@ export default function RegistrationScreen() {
 
   const handleHidePassword = () => {
     setIsHidePassword(!isHidePassword);
+  };
+
+  const handleSubmit = () => {
+    const { login, email, password } = state;
+    if (login === "" || email === "" || password === "") {
+      Alert.alert("Fill in all fields!");
+      return;
+    }
+    
+    console.log(state);
+    setState(initialState);
   };
 
   return (
@@ -54,6 +73,10 @@ export default function RegistrationScreen() {
                 placeholderTextColor="#BDBDBD"
                 onFocus={() => handleInputFocus("login")}
                 onBlur={handleInputBlur}
+                value={state.login}
+                onChangeText={(value) =>
+                  setState((prev) => ({ ...prev, login: value }))
+                }
               />
               <TextInput
                 style={[
@@ -66,6 +89,10 @@ export default function RegistrationScreen() {
                 autoCapitalize="none"
                 onFocus={() => handleInputFocus("email")}
                 onBlur={handleInputBlur}
+                value={state.email}
+                onChangeText={(value) =>
+                  setState((prev) => ({ ...prev, email: value }))
+                }
               />
               <View style={styles.passwordContainer}>
                 <TextInput
@@ -78,6 +105,10 @@ export default function RegistrationScreen() {
                   secureTextEntry={isHidePassword}
                   onFocus={() => handleInputFocus("password")}
                   onBlur={handleInputBlur}
+                  value={state.password}
+                  onChangeText={(value) =>
+                    setState((prev) => ({ ...prev, password: value }))
+                  }
                 />
                 <TouchableOpacity
                   style={styles.passwordButton}
@@ -89,7 +120,7 @@ export default function RegistrationScreen() {
                 </TouchableOpacity>
               </View>
             </View>
-            <TouchableOpacity style={styles.button}>
+            <TouchableOpacity style={styles.button} onPress={handleSubmit}>
               <Text style={styles.buttonTitle}>Зареєстуватися</Text>
             </TouchableOpacity>
             <TouchableOpacity>
