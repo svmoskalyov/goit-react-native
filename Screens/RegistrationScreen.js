@@ -23,7 +23,7 @@ export default function RegistrationScreen() {
       >
         <KeyboardAvoidingView
           behavior={Platform.OS == "ios" ? "padding" : "height"}
-          keyboardVerticalOffset={-165}
+          keyboardVerticalOffset={-170}
           style={styles.container}
         >
           <View style={styles.formContainer}>
@@ -84,9 +84,12 @@ const styles = StyleSheet.create({
   formInput: {
     padding: 16,
     height: 50,
-    borderRadius: 8,
     fontSize: 16,
     fontFamily: "Roboto-Regular",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: "#E8E8E8",
     backgroundColor: "#F6F6F6",
   },
   focusedFormInput: {
