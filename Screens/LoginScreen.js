@@ -1,76 +1,139 @@
-import { View, Text, TextInput, StyleSheet } from "react-native";
+import React, { useState } from "react";
+import {
+  StyleSheet,
+  View,
+  TextInput,
+  TouchableWithoutFeedback,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  ImageBackground,
+  Text,
+  TouchableOpacity,
+} from "react-native";
+import backgroundImage from "../assets/images/background.png";
 
-function LoginScreen() {
+export default function LoginScreen() {
+  const [focusedInput, setFocusedInput] = useState(null);
+  const [isHidePassword, setIsHidePassword] = useState(true);
+
+  const handleInputFocus = (input) => {
+    setFocusedInput(input);
+  };
+
+  const handleInputBlur = () => {
+    setFocusedInput(null);
+  };
+
+  const handleHidePassword = () => {
+    setIsHidePassword(!isHidePassword);
+  };
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Увійти</Text>
-      <View style={styles.thumbInput}>
-        <TextInput
-          style={styles.input}
-          placeholder="Адреса електронної пошти"
-          placeholderTextColor="#BDBDBD"
-          keyboardType="email-address"
-        />
-        <View style={styles.passwordContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Пароль"
-            placeholderTextColor="#BDBDBD"
-            secureTextEntry
-          />
-          <View style={styles.passwordButton}>
-            <Text style={styles.passwordButtonText}>
-              {true ? "Показати" : "Приховати"}
-            </Text>
+    <ImageBackground
+      source={backgroundImage}
+      style={{ position: "absolute", width: "100%", height: "100%" }}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <KeyboardAvoidingView
+          style={styles.container}
+          behavior={Platform.OS == "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={-235}
+        >
+          <View style={styles.formContainer}>
+            <Text style={styles.formTitle}>Увійти</Text>
+            <View style={styles.inputThumb}>
+              <TextInput
+                style={[
+                  styles.formInput,
+                  focusedInput === "email" && styles.focusedFormInput,
+                ]}
+                placeholder="Адреса електронної пошти"
+                placeholderTextColor="#BDBDBD"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                onFocus={() => handleInputFocus("email")}
+                onBlur={handleInputBlur}
+              />
+              <View style={styles.passwordContainer}>
+                <TextInput
+                  style={[
+                    styles.formInput,
+                    focusedInput === "password" && styles.focusedFormInput,
+                  ]}
+                  placeholder="Пароль"
+                  placeholderTextColor="#BDBDBD"
+                  secureTextEntry={isHidePassword}
+                  onFocus={() => handleInputFocus("password")}
+                  onBlur={handleInputBlur}
+                />
+                <TouchableOpacity
+                  style={styles.passwordButton}
+                  onPress={handleHidePassword}
+                >
+                  <Text style={styles.passwordButtonText}>
+                    {isHidePassword ? "Показати" : "Приховати"}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+            <TouchableOpacity style={styles.button}>
+              <Text style={styles.buttonTitle}>Увійти</Text>
+            </TouchableOpacity>
+            <TouchableOpacity>
+              <Text style={styles.textLogin}>
+                Немає акаунту?{" "}
+                <Text style={styles.registrationText}>Зареєструватися</Text>
+              </Text>
+            </TouchableOpacity>
           </View>
-        </View>
-      </View>
-      <View style={styles.button}>
-        <Text style={styles.buttonTitle}>Увійти</Text>
-      </View>
-      <View>
-        <Text style={styles.textAccount}>
-          Немає акаунту?{" "}
-          <Text style={styles.textRegistration}>Зареєструватися</Text>
-        </Text>
-      </View>
-    </View>
+        </KeyboardAvoidingView>
+      </TouchableWithoutFeedback>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: "stretch",
+    flex: 1,
+    justifyContent: "flex-end",
+  },
+  formContainer: {
+    paddingTop: 32,
+    paddingBottom: 144,
     paddingHorizontal: 16,
-    height: 489,
     borderTopStartRadius: 25,
     borderTopEndRadius: 25,
-    backgroundColor: "#fff",
+    backgroundColor: "#FFFFFF",
   },
-
-  title: {
-    paddingTop: 32,
-    paddingBottom: 32,
-    textAlign: "center",
+  formTitle: {
+    marginBottom: 32,
     fontSize: 30,
-    fontFamily: "RobotoMedium",
+    fontFamily: "Roboto-Medium",
     letterSpacing: 0.3,
-    color: "#212121",
+    textAlign: "center",
   },
-  thumbInput: {
+  inputThumb: {
     marginBottom: 43,
     gap: 16,
   },
-  input: {
+  formInput: {
     padding: 16,
     height: 50,
     fontSize: 16,
-    fontFamily: "RobotoRegular",
+    fontFamily: "Roboto-Regular",
     borderRadius: 8,
     borderWidth: 1,
     borderStyle: "solid",
     borderColor: "#E8E8E8",
     backgroundColor: "#F6F6F6",
+  },
+  focusedFormInput: {
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderRadius: 8,
+    borderColor: "#FF6C00",
+    backgroundColor: "#FFFFFF",
   },
   passwordContainer: {
     position: "relative",
@@ -82,7 +145,6 @@ const styles = StyleSheet.create({
   },
   passwordButtonText: {
     fontSize: 16,
-    fontFamily: "RobotoRegular",
     color: "#1B4371",
   },
   button: {
@@ -95,18 +157,16 @@ const styles = StyleSheet.create({
   buttonTitle: {
     textAlign: "center",
     fontSize: 16,
-    fontFamily: "RobotoRegular",
+    fontFamily: "Roboto-Regular",
     color: "#FFFFFF",
   },
-  textAccount: {
+  textLogin: {
     textAlign: "center",
     fontSize: 16,
-    fontFamily: "RobotoRegular",
+    fontFamily: "Roboto-Regular",
     color: "#1B4371",
   },
-  textRegistration: {
+  registrationText: {
     textDecorationLine: "underline",
   },
 });
-
-export default LoginScreen;
