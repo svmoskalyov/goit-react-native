@@ -15,12 +15,27 @@ import backgroundImage from "../assets/images/background.png";
 import Avatar from "../components/Avatar";
 
 export default function RegistrationScreen() {
+  const [focusedInput, setFocusedInput] = useState(null);
+  const [isHidePassword, setIsHidePassword] = useState(true);
+
+  const handleInputFocus = (input) => {
+    setFocusedInput(input);
+  };
+
+  const handleInputBlur = () => {
+    setFocusedInput(null);
+  };
+
+  const handleHidePassword = () => {
+    setIsHidePassword(!isHidePassword);
+  };
+
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <ImageBackground
-        source={backgroundImage}
-        style={{ position: "absolute", width: "100%", height: "100%" }}
-      >
+    <ImageBackground
+      source={backgroundImage}
+      style={{ position: "absolute", width: "100%", height: "100%" }}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <KeyboardAvoidingView
           behavior={Platform.OS == "ios" ? "padding" : "height"}
           keyboardVerticalOffset={-170}
@@ -30,16 +45,46 @@ export default function RegistrationScreen() {
             <Avatar />
             <Text style={styles.formTitle}>Реєстрація</Text>
             <View style={styles.inputThumb}>
-              <TextInput style={styles.formInput} placeholder="Логін" />
               <TextInput
-                style={styles.formInput}
+                style={[
+                  styles.formInput,
+                  focusedInput === "login" && styles.focusedFormInput,
+                ]}
+                placeholder="Логін"
+                placeholderTextColor="#BDBDBD"
+                onFocus={() => handleInputFocus("login")}
+                onBlur={handleInputBlur}
+              />
+              <TextInput
+                style={[
+                  styles.formInput,
+                  focusedInput === "email" && styles.focusedFormInput,
+                ]}
                 placeholder="Адреса електронної пошти"
+                placeholderTextColor="#BDBDBD"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                onFocus={() => handleInputFocus("email")}
+                onBlur={handleInputBlur}
               />
               <View style={styles.passwordContainer}>
-                <TextInput style={styles.formInput} placeholder="Пароль" />
-                <TouchableOpacity style={styles.passwordButton}>
+                <TextInput
+                  style={[
+                    styles.formInput,
+                    focusedInput === "password" && styles.focusedFormInput,
+                  ]}
+                  placeholder="Пароль"
+                  placeholderTextColor="#BDBDBD"
+                  secureTextEntry={isHidePassword}
+                  onFocus={() => handleInputFocus("password")}
+                  onBlur={handleInputBlur}
+                />
+                <TouchableOpacity
+                  style={styles.passwordButton}
+                  onPress={handleHidePassword}
+                >
                   <Text style={styles.passwordButtonText}>
-                    {true ? "Показати" : "Приховати"}
+                    {isHidePassword ? "Показати" : "Приховати"}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -52,8 +97,8 @@ export default function RegistrationScreen() {
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
-      </ImageBackground>
-    </TouchableWithoutFeedback>
+      </TouchableWithoutFeedback>
+    </ImageBackground>
   );
 }
 
