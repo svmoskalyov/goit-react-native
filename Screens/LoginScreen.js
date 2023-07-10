@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigation } from "@react-navigation/native";
 import {
   StyleSheet,
   View,
@@ -11,6 +12,7 @@ import {
   Text,
   TouchableOpacity,
   Alert,
+  useWindowDimensions,
 } from "react-native";
 import backgroundImage from "../assets/images/background.png";
 
@@ -23,6 +25,8 @@ export default function LoginScreen() {
   const [state, setState] = useState(initialState);
   const [focusedInput, setFocusedInput] = useState(null);
   const [isHidePassword, setIsHidePassword] = useState(true);
+  const { height, width } = useWindowDimensions();
+  const navigation = useNavigation();
 
   const handleInputFocus = (input) => {
     setFocusedInput(input);
@@ -38,25 +42,26 @@ export default function LoginScreen() {
 
   const handleSubmit = () => {
     const { email, password } = state;
-    if (email === "" || password === "") {
-      Alert.alert("Fill in all fields!");
+    if (!email.trim() || !password.trim()) {
+      Alert.alert("Заповніть поля");
       return;
     }
 
     console.log(state);
+    navigation.navigate("Home", state);
     setState(initialState);
   };
 
   return (
     <ImageBackground
       source={backgroundImage}
-      style={{ position: "absolute", width: "100%", height: "100%" }}
+      style={{ position: "absolute", width: width, height: height }}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <KeyboardAvoidingView
           style={styles.container}
           behavior={Platform.OS == "ios" ? "padding" : "height"}
-          keyboardVerticalOffset={-235}
+          keyboardVerticalOffset={Platform.OS === "ios" ? -240 : -250}
         >
           <View style={styles.formContainer}>
             <Text style={styles.formTitle}>Увійти</Text>
@@ -106,7 +111,9 @@ export default function LoginScreen() {
             <TouchableOpacity style={styles.button} onPress={handleSubmit}>
               <Text style={styles.buttonTitle}>Увійти</Text>
             </TouchableOpacity>
-            <TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("Registration")}
+            >
               <Text style={styles.textLogin}>
                 Немає акаунту?{" "}
                 <Text style={styles.registrationText}>Зареєструватися</Text>

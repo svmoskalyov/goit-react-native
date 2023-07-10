@@ -1,9 +1,9 @@
-import { StyleSheet, Text, View } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 
-export default function PostScreen() {
+export default function CreatePostsScreen() {
   return (
     <View style={styles.container}>
-      <Text>Posts</Text>
+      <Text>Create Post</Text>
     </View>
   );
 }
