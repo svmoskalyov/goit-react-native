@@ -1,8 +1,8 @@
 import { View } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
-import { AntDesign, Feather } from "@expo/vector-icons";
-import PostsScreen from "./PostsScreen";
+import { Feather } from "@expo/vector-icons";
+import DefaultPostsScreen from "./DefaultPostsScreen";
 import CreatePostsScreen from "./CreatePostsScreen";
 import ProfileScreen from "./ProfileScreen";
 
@@ -11,7 +11,7 @@ const MainTab = createBottomTabNavigator();
 export default function Home() {
   return (
     <MainTab.Navigator
-      initialRouteName="Posts"
+      initialRouteName="DefaultPostsScreen"
       screenOptions={{
         headerTitleAlign: "center",
         headerTitleStyle: {
@@ -22,7 +22,7 @@ export default function Home() {
         headerStyle: {
           borderBottomWidth: 0.5,
           borderBottomColor: "#21212120",
-          backgroundColor: "#ffffff",
+          backgroundColor: "#FFFFFF",
         },
         screenOptions: {
           tabBarHideOnKeyboard: true,
@@ -37,13 +37,13 @@ export default function Home() {
       }}
     >
       <MainTab.Screen
-        name="Posts"
-        component={PostsScreen}
+        name="DefaultPostsScreen"
+        component={DefaultPostsScreen}
         options={({ route }) => {
           getFocusedRouteNameFromRoute(route);
           return {
-            tabBarIcon: ({ size, color }) => (
-              <AntDesign name="appstore-o" size={size} color={color} />
+            tabBarIcon: ({ color }) => (
+              <Feather name="grid" size={24} color={color} />
             ),
             title: "Публікації",
             headerTitleStyle: {
@@ -69,7 +69,7 @@ export default function Home() {
         options={({ navigation }) => {
           return {
             tabBarStyle: { display: "none" },
-            tabBarIcon: ({ size }) => (
+            tabBarIcon: () => (
               <View
                 style={{
                   justifyContent: "center",
@@ -80,13 +80,13 @@ export default function Home() {
                   backgroundColor: "#FF6C00",
                 }}
               >
-                <Feather name="plus" size={size} color={"#fff"} />
+                <Feather name="plus" size={24} color={"#FFFFFF"} />
               </View>
             ),
             title: "Створити публікацію",
             headerStyle: {
               borderBottomWidth: 0.5,
-              borderBottomColor: "#212121CC",
+              borderBottomColor: "rgba(0, 0, 0, 0.30)",
             },
             headerTitleAlign: "center",
             headerTitleStyle: {
@@ -102,7 +102,7 @@ export default function Home() {
                 size={24}
                 style={{ marginLeft: 16 }}
                 onPress={() => {
-                  navigation.navigate("Posts");
+                  navigation.navigate("DefaultPostsScreen");
                 }}
               />
             ),
@@ -115,8 +115,8 @@ export default function Home() {
         options={{
           headerShown: false,
           tabBarShowLabel: false,
-          tabBarIcon: ({ size, color }) => (
-            <Feather name="user" size={size} color={color} />
+          tabBarIcon: ({ color }) => (
+            <Feather name="user" size={24} color={color} />
           ),
         }}
       />
