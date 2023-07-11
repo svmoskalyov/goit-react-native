@@ -48,9 +48,9 @@ export default function CreatePostsScreen({ navigation }) {
 
   const takePhoto = async () => {
     try {
-      const photo = await camera.takePictureAsync();
-      setPhoto(photo.uri);
-      setState((prevState) => ({ ...prevState, photo: photo.uri }));
+      const { uri } = await camera.takePictureAsync();
+      setPhoto(uri);
+      setState((prevState) => ({ ...prevState, photo: uri }));
     } catch (error) {
       console.log(error.message);
     }
@@ -58,12 +58,15 @@ export default function CreatePostsScreen({ navigation }) {
 
   const takeLocation = async () => {
     try {
-      let position = await Location.getCurrentPositionAsync();
-      const { latitude, longitude } = position.coords;
-      const coords = { latitude, longitude };
+      const {
+        coords: { latitude, longitude },
+      } = await Location.getCurrentPositionAsync();
       setState((prevState) => ({
         ...prevState,
-        coords,
+        coords: {
+          latitude,
+          longitude,
+        },
       }));
     } catch (error) {
       console.log(error.message);

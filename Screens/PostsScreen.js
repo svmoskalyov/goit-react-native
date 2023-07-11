@@ -53,7 +53,7 @@ export default function PostScreen({ route, navigation }) {
                       textDecorationLine: "underline",
                     }}
                   >
-                    {el.item.name}
+                    {el.item.location}
                   </Text>
                 </TouchableOpacity>
               </View>
