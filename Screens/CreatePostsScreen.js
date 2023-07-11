@@ -123,7 +123,11 @@ export default function CreatePostsScreen({ navigation }) {
             <TextInput
               style={{
                 ...styles.inputTitle,
-                marginTop: isShowKeyboard ? 20 : 48,
+                paddingTop: isShowKeyboard
+                  ? Platform.OS === "ios"
+                    ? 18
+                    : 16
+                  : 32,
               }}
               placeholder="Назва..."
               placeholderTextColor="#BDBDBD"
@@ -142,7 +146,15 @@ export default function CreatePostsScreen({ navigation }) {
               <AntDesign name="enviromento" size={24} color="#BDBDBD" />
             </View>
             <TextInput
-              style={{ ...styles.inputTitle, marginLeft: 32, marginTop: 32 }}
+              style={{
+                ...styles.inputTitle,
+                marginLeft: 32,
+                paddingTop: isShowKeyboard
+                  ? Platform.OS === "ios"
+                    ? 18
+                    : 16
+                  : 32,
+              }}
               placeholder="Місцевість..."
               placeholderTextColor="#BDBDBD"
               onFocus={() => setIsShowKeyboard(true)}
@@ -185,18 +197,13 @@ export default function CreatePostsScreen({ navigation }) {
               </Text>
             </TouchableOpacity>
           </View>
-          <View style={{ alignItems: "center", paddingTop: 120 }}>
-            <TouchableOpacity
-              style={{
-                justifyContent: "center",
-                alignItems: "center",
-                width: 70,
-                height: 40,
-                borderRadius: 20,
-                backgroundColor: "#F6F6F6",
-              }}
-              onPress={deletePost}
-            >
+          <View
+            style={{
+              alignItems: "center",
+              paddingTop: Platform.OS === "ios" ? 128 : 104,
+            }}
+          >
+            <TouchableOpacity style={styles.btnTrash} onPress={deletePost}>
               <AntDesign name="delete" size={24} color="#BDBDBD" />
             </TouchableOpacity>
           </View>
@@ -282,5 +289,13 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto-Regular",
     fontSize: 16,
     lineHeight: 19,
+  },
+  btnTrash: {
+    justifyContent: "center",
+    alignItems: "center",
+    width: 70,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#F6F6F6",
   },
 });
