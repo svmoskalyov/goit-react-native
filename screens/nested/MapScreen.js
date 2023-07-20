@@ -4,27 +4,21 @@ import { useRoute } from "@react-navigation/native";
 
 export default function MapScreen() {
   const {
-    location: { latitude, longitude },
+    coords: { latitude, longitude },
   } = useRoute().params;
 
   return (
     <View style={styles.container}>
       <MapView
+        style={styles.mapContainer}
         initialRegion={{
           latitude,
           longitude,
-          latitudeDelta: 0.0922,
-          longitudeDelta: 0.0421,
+          latitudeDelta: 0.001,
+          longitudeDelta: 0.006,
         }}
-        style={styles.map}
       >
-        <Marker
-          coordinate={{
-            latitude,
-            longitude,
-          }}
-          title="location photo"
-        />
+        <Marker coordinate={{ latitude, longitude }} title="location photo" />
       </MapView>
     </View>
   );
@@ -34,8 +28,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  map: {
-    width: "100%",
-    height: "100%",
+  mapContainer: {
+    flex: 1,
   },
 });

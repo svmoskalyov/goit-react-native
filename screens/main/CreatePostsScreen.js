@@ -1,95 +1,130 @@
-import React, { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
+  Platform,
   Image,
   TouchableWithoutFeedback,
   KeyboardAvoidingView,
-  TextInput,
   Keyboard,
-  Platform,
+  TextInput,
   Alert,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { useSelector } from "react-redux";
 import { Camera } from "expo-camera";
+import * as MediaLibrary from "expo-media-library";
 import * as Location from "expo-location";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { getFirestore, collection, addDoc } from "firebase/firestore";
 import { MaterialIcons, AntDesign } from "@expo/vector-icons";
+import app from "../../firebase/config";
+import { selectUserId, selectName } from "../../redux/auth/authSelectors";
 
 const initialState = {
-  name: "",
+  namePost: "",
   location: "",
   coords: {},
-  photo: "",
+  photo: null,
 };
 
-export default function CreatePostsScreen({ navigation }) {
+export default function CreatePostsScreen() {
+  const navigation = useNavigation();
+  const [isShowKeyboard, setIsShowKeyboard] = useState(false);
   const [state, setState] = useState(initialState);
   const [camera, setCamera] = useState(null);
-  const [photo, setPhoto] = useState(null);
-  const [isShowKeyboard, setIsShowKeyboard] = useState(false);
-  const [hasPermission, setHasPermission] = useState(null);
-
-  useEffect(() => {
-    (async () => {
-      const { status } = await Camera.requestCameraPermissionsAsync();
-      await Location.requestForegroundPermissionsAsync();
-
-      setHasPermission(status === "granted");
-    })();
-  }, []);
-
-  if (hasPermission === null) {
-    return <View />;
-  }
-  if (hasPermission === false) {
-    return Alert.alert("Немає доступу до камери");
-  }
-
-  const takePhoto = async () => {
-    try {
-      const { uri } = await camera.takePictureAsync();
-      setPhoto(uri);
-      setState((prevState) => ({ ...prevState, photo: uri }));
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
-
-  const takeLocation = async () => {
-    try {
-      const {
-        coords: { latitude, longitude },
-      } = await Location.getCurrentPositionAsync();
-      setState((prevState) => ({
-        ...prevState,
-        coords: {
-          latitude,
-          longitude,
-        },
-      }));
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
-
-  const sendPost = async () => {
-    const { photo, name, location } = state;
-    if (!photo || !name.trim() || !location.trim()) {
-      return;
-    }
-
-    navigation.navigate("Posts", { state });
-    setState(initialState);
-  };
-
-  const deletePost = () => {
-    setState(initialState);
-  };
+  const [location, setLocation] = useState(null);
+  const userId = useSelector(selectUserId);
+  const name = useSelector(selectName);
 
   const keyboardHide = () => {
     setIsShowKeyboard(false);
     Keyboard.dismiss();
+  };
+
+  const takePhoto = async () => {
+    try {
+      const photo = await camera.takePictureAsync();
+      const [position] = await Location.reverseGeocodeAsync(location);
+
+      setState((prevState) => ({
+        ...prevState,
+        photo: photo.uri,
+        location: `${position.city}, ${position.region}`,
+        coords: {
+          ...location,
+        },
+      }));
+    } catch (error) {
+      return console.error(error);
+    }
+  };
+
+  const sendPhoto = async () => {
+    await uploadPostToServer();
+    navigation.navigate("Публікації", { newPost: Date.now().toString() });
+    setState(initialState);
+  };
+
+  const uploadPhotoToServer = async () => {
+    try {
+      const response = await fetch(state.photo);
+      const file = await response.blob();
+      const uniquePostId = Date.now().toString();
+      const storage = getStorage();
+      const storageRef = ref(storage, `postImage/${uniquePostId}`);
+      await uploadBytes(storageRef, file);
+      const processedPhoto = await getDownloadURL(
+        ref(storage, `postImage/${uniquePostId}`)
+      );
+
+      return processedPhoto;
+    } catch (error) {
+      return console.error(error);
+    }
+  };
+
+  const uploadPostToServer = async () => {
+    const photo = await uploadPhotoToServer();
+    try {
+      const db = getFirestore(app);
+      const obj = {
+        ...state,
+        photo,
+        userId,
+        name,
+        timestamp: Date.now(),
+      };
+      const createPost = await addDoc(collection(db, "posts"), obj);
+    } catch (error) {
+      return console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    (async () => {
+      const { status } = await Camera.requestCameraPermissionsAsync();
+      await MediaLibrary.requestPermissionsAsync();
+      if (status !== "granted") {
+        return Alert.alert("У доступі до камери відмовлено");
+      }
+    })();
+
+    (async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        return Alert.alert("У доступі до місцезнаходження відмовлено");
+      }
+      const location = await Location.getCurrentPositionAsync({});
+      const { latitude, longitude } = location.coords;
+      setLocation({ latitude, longitude });
+    })();
+  }, []);
+
+  const deletePost = () => {
+    setState(initialState);
   };
 
   return (
@@ -99,26 +134,21 @@ export default function CreatePostsScreen({ navigation }) {
           <View style={styles.cameraWrapper}>
             <Camera style={styles.camera} ref={setCamera}>
               <View style={styles.takePhotoCamera}>
-                <Image source={{ uri: photo }} style={styles.photo} />
+                <Image source={{ uri: state.photo }} style={styles.photo} />
               </View>
               <TouchableOpacity
                 style={styles.buttonCamera}
                 onPress={() => {
                   takePhoto();
-                  takeLocation();
                 }}
               >
                 <MaterialIcons name="photo-camera" size={24} color="#FFFFFF" />
               </TouchableOpacity>
             </Camera>
           </View>
-          {!state.photo ? (
-            <Text style={styles.uploadText}>Завантажте фото</Text>
-          ) : (
-            <TouchableOpacity onPress={() => {}}>
-              <Text style={styles.uploadText}>Редагувати фото</Text>
-            </TouchableOpacity>
-          )}
+          <Text style={styles.uploadText}>
+            {!state.photo ? "Завантажити фото" : "Редагувати фото"}
+          </Text>
           <View style={styles.inpuWrapper}>
             <TextInput
               style={{
@@ -132,13 +162,10 @@ export default function CreatePostsScreen({ navigation }) {
               placeholder="Назва..."
               placeholderTextColor="#BDBDBD"
               onFocus={() => setIsShowKeyboard(true)}
+              value={state.namePost}
               onChangeText={(value) =>
-                setState((prevState) => ({
-                  ...prevState,
-                  name: value,
-                }))
+                setState((prevState) => ({ ...prevState, namePost: value }))
               }
-              value={state.name}
             />
           </View>
           <View style={styles.inpuWrapper}>
@@ -158,13 +185,13 @@ export default function CreatePostsScreen({ navigation }) {
               placeholder="Місцевість..."
               placeholderTextColor="#BDBDBD"
               onFocus={() => setIsShowKeyboard(true)}
+              value={state.location}
               onChangeText={(value) =>
                 setState((prevState) => ({
                   ...prevState,
                   location: value,
                 }))
               }
-              value={state.location}
             />
           </View>
           <View>
@@ -172,23 +199,23 @@ export default function CreatePostsScreen({ navigation }) {
               style={{
                 ...styles.btnPublish,
                 backgroundColor:
-                  !state.photo || !state.name || !state.location
+                  !state.photo || !state.namePost || !state.location
                     ? "#F6F6F6"
                     : "#FF6C00",
               }}
               activeOpacity={0.7}
               disabled={
-                !state.photo || !state.name || !state.location ? true : false
+                !state.photo || !state.namePost || !state.location
+                  ? true
+                  : false
               }
-              onPress={() => {
-                sendPost();
-              }}
+              onPress={sendPhoto}
             >
               <Text
                 style={{
                   ...styles.textBtn,
                   color:
-                    !state.photo || !state.name || !state.location
+                    !state.photo || !state.namePost || !state.location
                       ? "#BDBDBD"
                       : "#FFFFFF",
                 }}

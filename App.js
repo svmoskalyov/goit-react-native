@@ -1,17 +1,14 @@
-import "react-native-gesture-handler";
-import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
+import React from "react";
 import { useCallback } from "react";
+import "react-native-gesture-handler";
 import { View } from "react-native";
+import { Provider } from "react-redux";
 import { StatusBar } from "expo-status-bar";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
-import RegistrationScreen from "./Screens/RegistrationScreen";
-import LoginScreen from "./Screens/LoginScreen";
-import Home from "./Screens/Home";
-
-SplashScreen.preventAutoHideAsync();
-const MainStack = createStackNavigator();
+import { PersistGate } from "redux-persist/integration/react";
+import { store, persistor } from "./redux/store";
+import MainNavigation from "./navigations/MainNavigation";
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -24,33 +21,19 @@ export default function App() {
       await SplashScreen.hideAsync();
     }
   }, [fontsLoaded]);
-
+  
   if (!fontsLoaded) {
     return null;
   }
 
   return (
-    <View onLayout={onLayoutRootView} style={{ flex: 1 }}>
-      <StatusBar style="auto" />
-      <NavigationContainer>
-        <MainStack.Navigator initialRouteName="Login">
-          <MainStack.Screen
-            name="Registration"
-            component={RegistrationScreen}
-            options={{ headerShown: false }}
-          />
-          <MainStack.Screen
-            name="Login"
-            component={LoginScreen}
-            options={{ headerShown: false }}
-          />
-          <MainStack.Screen
-            name="Home"
-            component={Home}
-            options={{ headerShown: false }}
-          />
-        </MainStack.Navigator>
-      </NavigationContainer>
-    </View>
+    <Provider store={store}>
+      <PersistGate persistor={persistor}>
+        <View onLayout={onLayoutRootView} style={{ flex: 1 }}>
+          <StatusBar style="auto" />
+          <MainNavigation />
+        </View>
+      </PersistGate>
+    </Provider>
   );
 }
