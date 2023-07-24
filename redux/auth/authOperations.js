@@ -7,9 +7,11 @@ import {
   signOut,
 } from "firebase/auth";
 import app from "../../firebase/config";
-import { authSlice } from "../../redux/auth/authSlice";
-
-const { updateUserProfile, authStateChange, authSingOut } = authSlice.actions;
+import {
+  updateUserProfile,
+  authStateChange,
+  authSingOut,
+} from "../../redux/auth/authSlice";
 
 export const authSingUpUser =
   ({ name, email, password, photo }) =>
@@ -31,7 +33,7 @@ export const authSingUpUser =
         })
       );
     } catch (error) {
-      return console.error(error);
+      console.log(error);
     }
   };
 
@@ -50,7 +52,7 @@ export const authSingInUser =
         })
       );
     } catch (error) {
-      return console.error(error);
+      console.log(error);
     }
   };
 

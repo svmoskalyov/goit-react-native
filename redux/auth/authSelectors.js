@@ -1,4 +1,4 @@
-export const selectStateChange = (state) => Boolean(state.auth.stateChange);
-export const selectUserId = (state) => state.auth.userId;
-export const selectName = (state) => state.auth.name;
-export const selectPhoto = (state) => state.auth.photo;
+export const selectorStateChange = (state) => Boolean(state.auth.stateChange);
+export const selectorUserId = (state) => state.auth.userId;
+export const selectorName = (state) => state.auth.name;
+export const selectorPhoto = (state) => state.auth.photo;

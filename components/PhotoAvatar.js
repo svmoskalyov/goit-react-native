@@ -5,17 +5,16 @@ import {
   View,
   TouchableOpacity,
   Image,
-  Text,
   Alert,
 } from "react-native";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import * as ImagePicker from "expo-image-picker";
 import * as ImageManipulator from "expo-image-manipulator";
 import { AntDesign } from "@expo/vector-icons";
-import { selectUserId } from "../redux/auth/authSelectors";
+import { selectorUserId } from "../redux/auth/authSelectors";
 
 export default function PhotoAvatar({ photo, updatePhoto }) {
-  const userId = useSelector(selectUserId);
+  const userId = useSelector(selectorUserId);
   const [hasPermission, setHasPermission] = useState(null);
 
   const getAvatar = async () => {
@@ -65,15 +64,14 @@ export default function PhotoAvatar({ photo, updatePhoto }) {
         );
 
         if (!userId) {
-          updatePhoto(compressedImage.uri);
-          return;
+          return updatePhoto(compressedImage.uri);
         }
 
         const avatarUrl = await uploadPhotoToServer(compressedImage.uri);
         updatePhoto(avatarUrl);
       }
     } catch (error) {
-      return console.error(error);
+      console.log(error);
     }
   };
 
@@ -90,7 +88,7 @@ export default function PhotoAvatar({ photo, updatePhoto }) {
 
       return processedPhoto;
     } catch (error) {
-      return console.error(error);
+      console.log(error);
     }
   };
 

@@ -7,7 +7,7 @@ const state = {
   stateChange: false,
 };
 
-export const authSlice = createSlice({
+const authSlice = createSlice({
   name: "auth",
   initialState: state,
   reducers: {
@@ -23,3 +23,7 @@ export const authSlice = createSlice({
     authSingOut: () => state,
   },
 });
+
+export const { updateUserProfile, authStateChange, authSingOut } =
+  authSlice.actions;
+export default authSlice.reducer;

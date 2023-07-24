@@ -27,8 +27,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { format } from "date-fns";
 import { uk } from "date-fns/locale";
 import app from "../../firebase/config";
-import { updatePostById } from "../../redux/posts/postsSlice";
-import { selectUserId, selectName } from "../../redux/auth/authSelectors";
+import { updatePostById } from "../../redux/post/postSlice";
+import { selectorUserId, selectorName } from "../../redux/auth/authSelectors";
 
 export default function CommentsScreen() {
   const dispatch = useDispatch();
@@ -38,10 +38,10 @@ export default function CommentsScreen() {
   const [allComments, setAllComments] = useState([]);
   const [avatars, setAvatars] = useState({});
   const [focusedInput, setFocusedInput] = useState(null);
-  const userId = useSelector(selectUserId);
-  const name = useSelector(selectName);
+  const userId = useSelector(selectorUserId);
+  const name = useSelector(selectorName);
   const { photo } = useSelector((state) =>
-    state.posts.find((item) => item.id === postId)
+    state.post.find((item) => item.id === postId)
   );
 
   const handleInputFocus = (input) => {
@@ -76,7 +76,9 @@ export default function CommentsScreen() {
         ...doc.data(),
         id: doc.id,
       }));
-      setAllComments(result);
+
+      const sortedData = result?.sort((a, b) => b.timestamp - a.timestamp);
+      setAllComments(sortedData);
       dispatch(updatePostById({ id: postId, count: result.length }));
 
       const innerAvatars = { ...avatars };
@@ -87,9 +89,10 @@ export default function CommentsScreen() {
           }
         })
       );
+
       setAvatars(innerAvatars);
     } catch (error) {
-      return console.error(error);
+      console.log(error);
     }
   };
 
@@ -103,15 +106,17 @@ export default function CommentsScreen() {
       const processedPhoto = await getDownloadURL(
         ref(storage, `avatarImage/${userId}`)
       );
+
       return processedPhoto;
     } catch (error) {
+      console.log(error);
       return getImageWithoutAvatar({ name });
     }
   };
 
   useEffect(() => {
     getAllComments();
-  }, [route]);
+  }, [route.params]);
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -131,9 +136,7 @@ export default function CommentsScreen() {
               >
                 <Image
                   source={{
-                    uri: item.userId
-                      ? avatars[item.userId]
-                      : getImageWithoutAvatar(item),
+                    uri: item.userId ? avatars[item.userId] : firstTwoChars,
                   }}
                   style={{
                     ...styles.photoComment,

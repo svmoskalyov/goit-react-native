@@ -15,13 +15,12 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { Camera } from "expo-camera";
-import * as MediaLibrary from "expo-media-library";
 import * as Location from "expo-location";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { getFirestore, collection, addDoc } from "firebase/firestore";
 import { MaterialIcons, AntDesign } from "@expo/vector-icons";
 import app from "../../firebase/config";
-import { selectUserId, selectName } from "../../redux/auth/authSelectors";
+import { selectorUserId, selectorName } from "../../redux/auth/authSelectors";
 
 const initialState = {
   namePost: "",
@@ -36,8 +35,8 @@ export default function CreatePostsScreen() {
   const [state, setState] = useState(initialState);
   const [camera, setCamera] = useState(null);
   const [location, setLocation] = useState(null);
-  const userId = useSelector(selectUserId);
-  const name = useSelector(selectName);
+  const userId = useSelector(selectorUserId);
+  const name = useSelector(selectorName);
 
   const keyboardHide = () => {
     setIsShowKeyboard(false);
@@ -58,14 +57,18 @@ export default function CreatePostsScreen() {
         },
       }));
     } catch (error) {
-      return console.error(error);
+      console.log(error);
     }
   };
 
-  const sendPhoto = async () => {
-    await uploadPostToServer();
-    navigation.navigate("Публікації", { newPost: Date.now().toString() });
-    setState(initialState);
+  const sendPost = async () => {
+    try {
+      await uploadPostToServer();
+      navigation.navigate("Публікації", { newPost: Date.now().toString() });
+      setState(initialState);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const uploadPhotoToServer = async () => {
@@ -82,12 +85,13 @@ export default function CreatePostsScreen() {
 
       return processedPhoto;
     } catch (error) {
-      return console.error(error);
+      console.log(error);
     }
   };
 
   const uploadPostToServer = async () => {
     const photo = await uploadPhotoToServer();
+
     try {
       const db = getFirestore(app);
       const obj = {
@@ -97,16 +101,16 @@ export default function CreatePostsScreen() {
         name,
         timestamp: Date.now(),
       };
-      const createPost = await addDoc(collection(db, "posts"), obj);
+
+      await addDoc(collection(db, "posts"), obj);
     } catch (error) {
-      return console.error(error);
+      console.log(error);
     }
   };
 
   useEffect(() => {
     (async () => {
       const { status } = await Camera.requestCameraPermissionsAsync();
-      await MediaLibrary.requestPermissionsAsync();
       if (status !== "granted") {
         return Alert.alert("У доступі до камери відмовлено");
       }
@@ -117,6 +121,7 @@ export default function CreatePostsScreen() {
       if (status !== "granted") {
         return Alert.alert("У доступі до місцезнаходження відмовлено");
       }
+
       const location = await Location.getCurrentPositionAsync({});
       const { latitude, longitude } = location.coords;
       setLocation({ latitude, longitude });
@@ -202,6 +207,11 @@ export default function CreatePostsScreen() {
                   !state.photo || !state.namePost || !state.location
                     ? "#F6F6F6"
                     : "#FF6C00",
+                marginTop: isShowKeyboard
+                  ? Platform.OS === "ios"
+                    ? 60
+                    : 60
+                  : 32,
               }}
               activeOpacity={0.7}
               disabled={
@@ -209,7 +219,7 @@ export default function CreatePostsScreen() {
                   ? true
                   : false
               }
-              onPress={sendPhoto}
+              onPress={sendPost}
             >
               <Text
                 style={{
@@ -306,7 +316,6 @@ const styles = StyleSheet.create({
   btnPublish: {
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 32,
     marginHorizontal: 16,
     height: 51,
     borderRadius: 100,

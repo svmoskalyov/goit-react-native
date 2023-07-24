@@ -11,14 +11,14 @@ import {
   getCountFromServer,
 } from "firebase/firestore";
 import app from "../../firebase/config";
-import { updatePosts } from "../../redux/posts/postsSlice";
-import { selectPosts } from "../../redux/posts/postsSelectors";
+import { updatePosts } from "../../redux/post/postSlice";
+import { selectorPost } from "../../redux/post/postSelectors";
 import PostCard from "../../components/PostCard";
 
 export default function PostsScreen() {
   const dispatch = useDispatch();
   const route = useRoute();
-  const posts = useSelector(selectPosts);
+  const posts = useSelector(selectorPost);
 
   const getAllPost = async () => {
     const db = getFirestore(app);

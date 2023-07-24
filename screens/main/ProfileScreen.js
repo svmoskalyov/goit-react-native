@@ -26,32 +26,30 @@ import {
   authUpdatePhotoUser,
 } from "../../redux/auth/authOperations";
 import {
-  selectUserId,
-  selectName,
-  selectPhoto,
+  selectorUserId,
+  selectorName,
+  selectorPhoto,
 } from "../../redux/auth/authSelectors";
+import { selectorPost } from "../../redux/post/postSelectors";
 import backgroundImage from "../../assets/images/background.png";
 import PhotoAvatar from "../../components/PhotoAvatar";
 import PostCard from "../../components/PostCard";
 
 export default function ProfileScreen() {
   const dispatch = useDispatch();
-  const userId = useSelector(selectUserId);
-  const name = useSelector(selectName);
-  const photo = useSelector(selectPhoto);
+  const userId = useSelector(selectorUserId);
+  const name = useSelector(selectorName);
+  const photo = useSelector(selectorPhoto);
   const [userPosts, setUserPosts] = useState([]);
   const { height, width } = useWindowDimensions();
-
-  console.log("🚀 ~ ProfileScreen ~ userPosts:", userPosts.length);
+  const posts = useSelector(selectorPost);
 
   const getUserPosts = async () => {
     const db = getFirestore(app);
-
     try {
       const querySnapshot = await getDocs(
         query(collection(db, "posts"), where("userId", "==", userId))
       );
-
       const result = await Promise.all(
         querySnapshot.docs.map(async (doc) => {
           const snap = await getCountFromServer(
@@ -60,15 +58,16 @@ export default function ProfileScreen() {
           return { ...doc.data(), id: doc.id, count: snap.data().count };
         })
       );
-      setUserPosts(result);
+      const sortedData = result?.sort((a, b) => b.timestamp - a.timestamp);
+      setUserPosts(sortedData);
     } catch (error) {
-      return console.error(error);
+      console.log(error);
     }
   };
 
   useEffect(() => {
     getUserPosts();
-  }, [userPosts]);
+  }, [posts]);
 
   const singOut = () => {
     dispatch(authSingOutUser());
@@ -101,14 +100,13 @@ export default function ProfileScreen() {
           >
             <SafeAreaView
               style={{
-                flex: Platform.OS === "ios" ? 0.68 : 0.65,
+                flex: Platform.OS === "ios" ? 0.55 : 0.68,
               }}
             >
               <FlatList
                 data={userPosts}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => <PostCard item={item} />}
-                inverted={userPosts.length > 1 ? false : true}
               />
             </SafeAreaView>
           </View>
